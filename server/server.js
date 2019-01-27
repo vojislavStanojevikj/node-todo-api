@@ -1,33 +1,38 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const bodyParser = require('body-parser');
+const PORT = require('../config/config').PORT;
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://172.17.0.2:27017/TodoApp');
+const {Todo} = require('../model/Todo');
+const {User} = require('../model/User');
 
-const Todo = mongoose.model('Todo', {
-    text: {
-        type: String,
-        required: true,
-        trim: true,
-        minLength: 1
-    },
-    completed: {
-        type: Boolean,
-        default: false
-    },
-    completedAt: {
-        type: Number,
-        default: null
-    }
+
+const app = express();
+
+app.use(bodyParser.json());
+
+app.post('/todos', (req, res) => {
+
+    const toPersistTodo = new Todo({text: req.body.text});
+    toPersistTodo.save().then(result => {
+        console.log('Persisting Todo......');
+        res.status(200).json(result);
+    }).catch(error => {
+        const msg = 'Persisting Todo failed......';
+        console.error(msg);
+        res.status(400).json({error: msg})
+    });
+
 });
 
-const User = mongoose.model('User', {
-    email: {
-        type: String,
-        required: true,
-        trim: true,
-        minLength: 1
-    }
+
+
+app.listen(PORT, () =>{
+   console.log(`Listening at PORT: ${PORT}`);
 });
+
+
+
+
 
 //
 // const toDoActivity = new Todo({text: 'Cock Dinner'});
@@ -48,14 +53,14 @@ const User = mongoose.model('User', {
 //     });
 
 
-const firstUser = new User({email: 'Test@test.com'});
-
-firstUser.save()
-    .then(document => {
-        console.log('User saved!', JSON.stringify(document, undefined, 2));
-    }).catch(error => {
-        console.error('Error saving user!', error);
-    });
+// const firstUser = new User({email: 'Test@test.com'});
+//
+// firstUser.save()
+//     .then(document => {
+//         console.log('User saved!', JSON.stringify(document, undefined, 2));
+//     }).catch(error => {
+//         console.error('Error saving user!', error);
+//     });
 
 // const firstUser = new User({email: {}});
 //
