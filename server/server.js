@@ -55,6 +55,23 @@ app.get('/todos/:id', (req, res) => {
 
 });
 
+app.delete('/todos/:id', (req, res) => {
+
+    if (!ObjectID.isValid(req.params.id)) {
+        return sendError(400, 'Provided id is not valid!', res);
+    }
+
+    Todo.findByIdAndRemove(req.params.id)
+        .then(result => {
+            if (!result) {
+                return sendError(404, 'Requested resource not found!', res);
+            } else {
+                return res.status(200).send({todo: result});
+            }
+        }).catch(error => sendError(400, 'Internal server error', res));
+
+});
+
 
 function sendError(status, msg, res) {
     res.status(status).send({error: msg});

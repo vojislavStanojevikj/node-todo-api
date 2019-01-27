@@ -185,3 +185,60 @@ describe('GET By ID todo', () => {
 
 });
 
+describe('Delete By ID todo', () => {
+
+    const testText = 'testTodo';
+    const testTodo = new Todo({_id: new ObjectID('5c4dc7e54bf68b3549083ee5'),text: testText});
+
+
+    before((done) => {
+        testTodo.save().then(result => done()).catch(error => done(error));
+
+    });
+
+    after((done) => {
+        Todo.remove({_id: new ObjectID('5c4dc7e54bf68b3549083ee5')}).then(result => done()).catch(error => done(error));
+    });
+
+    it('should delete one todo by id', (done) => {
+        request(app)
+            .delete(`/todos/${testTodo._id.toHexString()}`)
+            .expect(200)
+            .expect(res => {
+                expect(res.body.todo._id).toEqual(testTodo._id.toHexString());
+                expect(res.body.todo.text).toBe(testTodo.text);
+            }).end(result => {
+
+                Todo.find().then(todos => {
+                    expect(todos.length).toBe(0);
+                    done();
+                }).catch(error => {
+                    done(error);
+                })
+        });
+    });
+
+    it('should fail to delete with invalid id', () => {
+
+        request(app)
+            .delete('/todos/123')
+            .expect(400)
+            .expect((res) => {
+                expect(res.body.error).toBe('Provided id is not valid!');
+            });
+
+    });
+
+    it('should not delete todo with not existing id', (done) => {
+
+        request(app)
+            .delete(`/todos/${new ObjectID()}`)
+            .expect(404)
+            .expect((res) => {
+                expect(res.body.error).toBe('Requested resource not found!');
+            }).end(done);
+    });
+
+
+});
+
