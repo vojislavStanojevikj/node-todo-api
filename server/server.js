@@ -21,7 +21,18 @@ app.post('/todos', (req, res) => {
         console.error(msg);
         res.status(400).json({error: msg})
     });
+});
 
+app.get('/todos', (req, res) => {
+
+    Todo.find().then(todos => {
+        console.log('Persisting Todo......');
+        res.status(200).json({todos});
+    }).catch(error => {
+        const msg = 'Fetching Todo failed......';
+        console.error(msg);
+        res.status(400).json({error: msg})
+    });
 });
 
 
