@@ -214,7 +214,7 @@ describe('Delete By ID todo', () => {
                     done();
                 }).catch(error => {
                     done(error);
-                })
+                });
         });
     });
 
@@ -233,6 +233,76 @@ describe('Delete By ID todo', () => {
 
         request(app)
             .delete(`/todos/${new ObjectID()}`)
+            .expect(404)
+            .expect((res) => {
+                expect(res.body.error).toBe('Requested resource not found!');
+            }).end(done);
+    });
+
+
+});
+
+describe('Update By ID todo', () => {
+
+    const testText = 'testTodo';
+    const testTodo = new Todo({_id: new ObjectID('5c4dc7e54bf68b3549083ee5'),text: testText});
+    const testTodo2 = new Todo({_id: new ObjectID('5c4dc7e54bf68b3549083ee6'),text: testText, completed: true, completedAt: new Date().getTime()});
+
+
+    before((done) => {
+        testTodo.save().then(result => {
+            return testTodo2.save();
+        })
+        .then(result2 => done())
+            .catch(error => done(error));
+    });
+
+    after((done) => {
+        Todo.remove({text: testText}).then(result => done()).catch(error => done(error));
+    });
+
+    it('should update one todo by id, change the completed flag, and set updatedAt timestamp', (done) => {
+        request(app)
+            .patch(`/todos/${testTodo._id.toHexString()}`)
+            .send({completed: true})
+            .expect(200)
+            .expect(res => {
+                expect(res.body.todo._id).toEqual(testTodo._id.toHexString());
+                expect(res.body.todo.text).toBe(testTodo.text);
+                expect(res.body.todo.completed).toBe(true);
+                expect(res.body.todo.completedAt).toNotEqual(null);
+                expect(res.body.todo.completedAt).toBeA('number');
+            }).end(done);
+    });
+
+    it('should update one todo by id, change the completed flag, and clear updatedAt timestamp', (done) => {
+        request(app)
+            .patch(`/todos/${testTodo2._id.toHexString()}`)
+            .send({completed: false})
+            .expect(200)
+            .expect(res => {
+                expect(res.body.todo._id).toEqual(testTodo2._id.toHexString());
+                expect(res.body.todo.text).toBe(testTodo2.text);
+                expect(res.body.todo.completed).toBe(false);
+                expect(res.body.todo.completedAt).toEqual(null);
+            }).end(done);
+    });
+
+    it('should fail to update with invalid id', () => {
+
+        request(app)
+            .patch('/todos/123')
+            .expect(400)
+            .expect((res) => {
+                expect(res.body.error).toBe('Provided id is not valid!');
+            });
+
+    });
+
+    it('should not update todo with not existing id', (done) => {
+
+        request(app)
+            .patch(`/todos/${new ObjectID()}`)
             .expect(404)
             .expect((res) => {
                 expect(res.body.error).toBe('Requested resource not found!');
