@@ -1,8 +1,8 @@
+require('../config/config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
-const PORT = process.env.PORT || require('../config/config').PORT;
 
 const {Todo} = require('../model/Todo');
 const {User} = require('../model/User');
@@ -16,25 +16,15 @@ app.post('/todos', (req, res) => {
 
     const toPersistTodo = new Todo({text: req.body.text});
     toPersistTodo.save().then(result => {
-        console.log('Persisting Todo......');
-        res.status(200).json(result);
-    }).catch(error => {
-        const msg = 'Persisting Todo failed......';
-        console.error(msg);
-        res.status(400).json({error: msg})
-    });
+        return res.status(200).json(result);
+    }).catch(error => sendError(400, 'Persisting Todo failed......', res));
 });
 
 app.get('/todos', (req, res) => {
 
     Todo.find().then(todos => {
-        console.log('Persisting Todo......');
-        res.status(200).json({todos});
-    }).catch(error => {
-        const msg = 'Fetching Todo failed......';
-        console.error(msg);
-        res.status(400).json({error: msg})
-    });
+        return res.status(200).json({todos});
+    }).catch(error => sendError(400, 'Error fetching data......', res));
 });
 
 
@@ -106,8 +96,8 @@ function sendError(status, msg, res) {
     res.status(status).send({error: msg});
 }
 
-app.listen(PORT, () =>{
-   console.log(`Listening at PORT: ${PORT}`);
+app.listen(process.env.PORT, () =>{
+   console.log(`Listening at PORT: ${process.env.PORT}`);
 });
 
 
