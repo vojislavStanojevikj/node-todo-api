@@ -31,42 +31,4 @@ app.listen(PORT, () =>{
 });
 
 
-
-
-
-//
-// const toDoActivity = new Todo({text: 'Cock Dinner'});
-//
-// toDoActivity.save().then(result => {
-//     console.log('Saved Todo!', result);
-// }).catch(error => {
-//     console.error('Saving Todo failed!', error);
-// });
-
-// const newTodo = new Todo({text: '   Edit this video'});
-//
-// newTodo.save()
-//     .then(document => {
-//         console.log('Saved Todo!', document);
-//     }).catch(error => {
-//         console.error('Saving Todo failed!', error);
-//     });
-
-
-// const firstUser = new User({email: 'Test@test.com'});
-//
-// firstUser.save()
-//     .then(document => {
-//         console.log('User saved!', JSON.stringify(document, undefined, 2));
-//     }).catch(error => {
-//         console.error('Error saving user!', error);
-//     });
-
-// const firstUser = new User({email: {}});
-//
-// firstUser.save()
-//     .then(document => {
-//         console.log('User saved!', JSON.stringify(document, undefined, 2));
-//     }).catch(error => {
-//     console.error('Error saving user!', error);
-// });
+module.exports = {app};
