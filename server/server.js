@@ -91,6 +91,22 @@ app.patch('/todos/:id', (req, res) => {
 
 });
 
+app.post('/users', (req, res) => {
+
+    const body = _.pick(req.body, ['email', 'password']);
+
+    const userToPersist = new User(body);
+    userToPersist.save()
+        .then(result => {
+            return result.generateAuthToken();
+        })
+        .then(token => {
+            res.header('x-auth', token).status(200).json(userToPersist);
+        })
+        .catch(error => sendError(400, 'Persisting User failed......', res));
+
+});
+
 
 function sendError(status, msg, res) {
     res.status(status).send({error: msg});
